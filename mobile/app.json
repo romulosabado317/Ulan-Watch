@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Ulan Watch",
+    "slug": "ulan-watch",
+    "version": "1.0.0",
+    "icon": "./assets/icon.png",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0E2A3D"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ulanwatch.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Ulan Watch uses your location to center the map on your area and to speed up flood reporting.",
+        "NSCameraUsageDescription": "Ulan Watch uses your camera to attach a photo to a flood report.",
+        "NSPhotoLibraryUsageDescription": "Ulan Watch needs access to your photos to attach one to a flood report."
+      }
+    },
+    "android": {
+      "package": "com.ulanwatch.app",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      "expo-status-bar"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0f9d3cef-669f-481b-b898-becbcd0aa12b"
+      }
+    }
+  }
+}
