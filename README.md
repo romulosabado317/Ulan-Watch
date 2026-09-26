@@ -138,3 +138,7 @@ fully working end to end between the app and the API.
 - **The downloaded APK closes immediately:** make sure you built a new APK after these changes,
   then uninstall the old APK before installing the new one. The app no longer requires a Google
   Maps API key.
+
+
+
+Hi im Romulo
