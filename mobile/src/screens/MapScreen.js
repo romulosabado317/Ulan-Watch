@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, WATER_LEVELS } from '../theme';
 import FreeMap from '../components/FreeMap';
@@ -19,8 +19,8 @@ export default function MapScreen({ reports }) {
       </View>
 
       <View style={styles.filters}>
-        <Text style={styles.filterTitle}>Show</Text>
-        <View style={styles.filterRow}>
+        <Text style={styles.filterTitle}>Flood depth</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
           <TouchableOpacity accessibilityRole="button" onPress={() => setFilter('all')} style={[styles.filter, filter === 'all' && styles.filterActive]}>
             <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>All</Text>
           </TouchableOpacity>
@@ -30,7 +30,7 @@ export default function MapScreen({ reports }) {
               <Text style={[styles.filterText, filter === lvl.id && styles.filterTextActive]}>{lvl.label.split('-')[0]}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
       <View style={styles.legend}>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.line
   },
   filterTitle: { fontSize: 10.5, color: COLORS.muted, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 7 },
-  filterRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  filterRow: { flexDirection: 'row', gap: 6, paddingRight: 2 },
   filter: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: COLORS.line, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 6, backgroundColor: COLORS.paper },
   filterActive: { backgroundColor: COLORS.ink, borderColor: COLORS.ink },
   filterText: { fontSize: 10.5, color: COLORS.muted, fontWeight: '600' },

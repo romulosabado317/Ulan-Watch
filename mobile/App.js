@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from './src/theme';
@@ -134,7 +134,9 @@ export default function App() {
               </View>
               <Text style={styles.topbarTitle}>Ulan Watch</Text>
             </View>
-            <Text style={styles.topbarSub}>{profile ? 'Community flood intelligence · Las Piñas' : 'Live flood map · Las Piñas'}</Text>
+            <Text style={styles.topbarSub} numberOfLines={1}>
+              {profile ? 'Community flood intelligence · Antipolo City' : 'Live flood map · Antipolo City'}
+            </Text>
           </View>
           {profile ? (
             <View style={styles.avatar}>
@@ -184,7 +186,11 @@ export default function App() {
 
 const styles = StyleSheet.create({
   loading: { flex: 1, backgroundColor: COLORS.ink },
-  appContainer: { flex: 1, backgroundColor: COLORS.mist },
+  appContainer: {
+    flex: 1,
+    backgroundColor: COLORS.mist,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0
+  },
   topbar: { backgroundColor: COLORS.ink, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 15 },
   topbarRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },

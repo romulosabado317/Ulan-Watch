@@ -27,8 +27,8 @@ export function levelInfo(id) {
 }
 
 export const DEFAULT_REGION = {
-  latitude: 14.4445,
-  longitude: 120.9938,
-  latitudeDelta: 0.04,
-  longitudeDelta: 0.04
+  latitude: 14.5866,
+  longitude: 121.1761,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05
 };
