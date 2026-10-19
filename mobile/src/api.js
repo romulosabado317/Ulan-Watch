@@ -4,6 +4,9 @@ import axios from 'axios';
 // e.g. "http://192.168.1.10:4000". "localhost" will not work from a phone.
 // Find your IP with `ipconfig` (Windows) or `ifconfig` / `ipconfig getifaddr en0` (Mac).
 const configuredApiUrl = process.env.EXPO_PUBLIC_API_URL;
+if (!configuredApiUrl && !__DEV__) {
+  throw new Error('EXPO_PUBLIC_API_URL must be set for release builds.');
+}
 export const API_BASE_URL = (configuredApiUrl || 'http://192.168.0.105:4000').replace(/\/+$/, '');
 
 const client = axios.create({
