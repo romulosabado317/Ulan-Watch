@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, levelInfo } from '../theme';
 import { initials, timeAgo } from '../utils/haversine';
 import { updateReportStatus } from '../api';
@@ -81,14 +82,40 @@ export default function ProfileScreen({ profile, reports, onLogout, onReportsCha
       )}
 
       <Text style={[styles.sectionTitle, { marginTop: 22 }]}>About this build</Text>
-      <View style={styles.card}>
-        <Text style={styles.aboutText}>
-          This React Native app covers the core scope of the Ulan Watch proposal: report submission with photo and
-          water level, a live crowd-verified map, confidence scoring, flood history, saved-location alerts, and
-          coordinator moderation. It talks to the included Node/Express API. Swap the JSON file store for
-          PostgreSQL with PostGIS to match the proposal's production data layer.
+      <View style={styles.aboutHero}>
+        <View style={styles.aboutHeroTop}>
+          <View style={styles.aboutIcon}>
+            <Ionicons name="water" size={20} color={COLORS.ink} />
+          </View>
+          <Text style={styles.version}>VERSION 1.0.0</Text>
+        </View>
+        <Text style={styles.aboutTitle}>Ulan Watch</Text>
+        <Text style={styles.aboutDescription}>
+          Community-powered flood updates to help you make safer decisions around Antipolo City.
         </Text>
       </View>
+
+      <View style={styles.aboutFeatures}>
+        {[
+          { icon: 'map-outline', title: 'Live flood map', detail: 'View reports and community confidence at a glance.' },
+          { icon: 'water-outline', title: 'Detailed reports', detail: 'Share a location, water level, note, and photo.' },
+          { icon: 'notifications-outline', title: 'Saved-location alerts', detail: 'See active reports near places that matter to you.' },
+          { icon: 'shield-checkmark-outline', title: 'Coordinator review', detail: 'Coordinators can resolve or flag reports.' }
+        ].map((feature) => (
+          <View key={feature.title} style={styles.featureRow}>
+            <View style={styles.featureIcon}>
+              <Ionicons name={feature.icon} size={17} color={COLORS.tealDark} />
+            </View>
+            <View style={styles.featureCopy}>
+              <Text style={styles.featureTitle}>{feature.title}</Text>
+              <Text style={styles.featureDetail}>{feature.detail}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+      <Text style={styles.aboutFootnote}>
+        Reports are community-submitted and should be used alongside official safety advisories.
+      </Text>
     </ScrollView>
   );
 }
@@ -140,5 +167,53 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   actionText: { fontSize: 12.5, color: COLORS.ink },
-  aboutText: { fontSize: 12.5, color: COLORS.muted, lineHeight: 19 }
+  aboutHero: {
+    backgroundColor: COLORS.ink,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 10
+  },
+  aboutHeroTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  aboutIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 11,
+    backgroundColor: COLORS.lime,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  version: {
+    color: '#C7D8E5',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    overflow: 'hidden',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6
+  },
+  aboutTitle: { color: '#fff', fontSize: 20, fontWeight: '800', marginTop: 15 },
+  aboutDescription: { color: '#D3E0EA', fontSize: 12.5, lineHeight: 19, marginTop: 5 },
+  aboutFeatures: {
+    backgroundColor: COLORS.paper,
+    borderWidth: 1,
+    borderColor: COLORS.line,
+    borderRadius: 12,
+    paddingHorizontal: 13
+  },
+  featureRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12 },
+  featureIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: COLORS.sky,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 11
+  },
+  featureCopy: { flex: 1 },
+  featureTitle: { color: COLORS.ink, fontSize: 12.5, fontWeight: '700' },
+  featureDetail: { color: COLORS.muted, fontSize: 11.5, lineHeight: 16, marginTop: 2 },
+  aboutFootnote: { color: COLORS.muted, fontSize: 11, lineHeight: 16, marginTop: 11, paddingHorizontal: 2 }
 });

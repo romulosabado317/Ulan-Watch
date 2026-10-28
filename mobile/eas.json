@@ -19,6 +19,9 @@
       "autoIncrement": true,
       "distribution": "internal",
       "environment": "production",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://ulan-watch.onrender.com"
+      },
       "android": {
         "buildType": "apk"
       }

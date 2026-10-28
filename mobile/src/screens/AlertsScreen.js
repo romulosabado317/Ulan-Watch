@@ -24,7 +24,10 @@ export default function AlertsScreen({ reports, profile, onProfileChange }) {
   }, [reports, profile.savedLocations]);
 
   function removeLocation(id) {
-    const updated = { ...profile, savedLocations: profile.savedLocations.filter((l) => l.id !== id) };
+    const updated = {
+      ...profile,
+      savedLocations: (profile.savedLocations || []).filter((l) => l.id !== id)
+    };
     onProfileChange(updated);
   }
 
@@ -74,10 +77,10 @@ export default function AlertsScreen({ reports, profile, onProfileChange }) {
       {nearby.length === 0 ? (
         <Text style={styles.empty}>No active flood reports near your saved locations right now.</Text>
       ) : (
-        nearby.map((a, idx) => {
+        nearby.map((a) => {
           const lvl = levelInfo(a.report.waterLevel);
           return (
-            <View key={idx} style={styles.card}>
+            <View key={a.report.id + ':' + a.location.id} style={styles.card}>
               <Text style={styles.cardTitle}>{a.report.street}</Text>
               <Text style={styles.cardSub}>
                 {a.distance}m from "{a.location.label}" · {timeAgo(a.report.createdAt)}

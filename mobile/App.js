@@ -15,11 +15,27 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import BottomTabBar from './src/components/BottomTabBar';
 
 const SESSION_KEY = '@ulanwatch/session';
+const savedLocationsKey = (userId) => '@ulanwatch/savedLocations:' + userId;
+
+async function loadSavedLocations(userId, legacyLocations) {
+  const raw = await AsyncStorage.getItem(savedLocationsKey(userId));
+  if (raw !== null) {
+    const locations = JSON.parse(raw);
+    return Array.isArray(locations) ? locations : [];
+  }
+
+  const locations = Array.isArray(legacyLocations) ? legacyLocations : [];
+  if (locations.length) {
+    await AsyncStorage.setItem(savedLocationsKey(userId), JSON.stringify(locations));
+  }
+  return locations;
+}
 
 export default function App() {
   const [profile, setProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [reports, setReports] = useState([]);
+  const [reportsLoaded, setReportsLoaded] = useState(false);
   const [tab, setTab] = useState('map');
   const [bannerText, setBannerText] = useState(null);
   const seenAlertIds = useRef({});
@@ -36,7 +52,8 @@ export default function App() {
         const session = JSON.parse(raw);
         setAuthToken(session.token);
         const user = await fetchCurrentUser();
-        setProfile({ ...user, savedLocations: session.user?.savedLocations || [] });
+        const savedLocations = await loadSavedLocations(user.id, session.user?.savedLocations);
+        setProfile({ ...user, savedLocations });
       } catch (error) {
         setAuthToken(null);
         await AsyncStorage.removeItem(SESSION_KEY);
@@ -48,7 +65,10 @@ export default function App() {
 
   const refreshReports = useCallback(() => {
     fetchReports()
-      .then((list) => setReports(list))
+      .then((list) => {
+        setReports(list);
+        setReportsLoaded(true);
+      })
       .catch(() => {
         // Backend not reachable yet; keep last known list.
       });
@@ -61,7 +81,7 @@ export default function App() {
   }, [refreshReports]);
 
   useEffect(() => {
-    if (!profile) return;
+    if (!profile || !reportsLoaded) return;
     const active = reports.filter((r) => r.status === 'active');
     const alerts = [];
     active.forEach((r) => {
@@ -72,41 +92,54 @@ export default function App() {
     });
     if (!hasAlertBaseline.current) {
       alerts.forEach((a) => {
-        seenAlertIds.current[a.report.id] = true;
+        seenAlertIds.current[a.report.id + ':' + a.location.id] = true;
       });
       hasAlertBaseline.current = true;
       return;
     }
-    const fresh = alerts.filter((a) => !seenAlertIds.current[a.report.id]);
+    const fresh = alerts.filter((a) => !seenAlertIds.current[a.report.id + ':' + a.location.id]);
     if (fresh.length) {
       setBannerText('New report near "' + fresh[0].location.label + '": ' + fresh[0].report.street);
       setHasAlertDot(true);
       fresh.forEach((a) => {
-        seenAlertIds.current[a.report.id] = true;
+        seenAlertIds.current[a.report.id + ':' + a.location.id] = true;
       });
     }
-  }, [reports, profile]);
+  }, [reports, profile, reportsLoaded]);
 
-  function handleAuthenticated(session) {
+  async function handleAuthenticated(session) {
     setAuthToken(session.token);
     setReports([]);
+    setReportsLoaded(false);
     seenAlertIds.current = {};
     hasAlertBaseline.current = false;
-    const profileWithLocalData = { ...session.user, savedLocations: [] };
-    AsyncStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, user: profileWithLocalData })).then(() => setProfile(profileWithLocalData));
+    try {
+      const savedLocations = await loadSavedLocations(session.user.id, session.user.savedLocations);
+      const profileWithLocalData = { ...session.user, savedLocations };
+      await AsyncStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, user: profileWithLocalData }));
+      setProfile(profileWithLocalData);
+    } catch (error) {
+      setAuthToken(null);
+      setBannerText('Could not save your sign-in on this device. Please try again.');
+    }
   }
 
-  function handleProfileChange(updated) {
-    AsyncStorage.getItem(SESSION_KEY).then((raw) => {
-      if (!raw) return;
-      const session = JSON.parse(raw);
-      return AsyncStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, user: updated }));
-    }).finally(() => setProfile(updated));
+  async function handleProfileChange(updated) {
+    try {
+      await AsyncStorage.setItem(
+        savedLocationsKey(updated.id),
+        JSON.stringify(updated.savedLocations || [])
+      );
+      setProfile(updated);
+    } catch (error) {
+      setBannerText('Could not save your location changes. Please try again.');
+    }
   }
 
   function handleLogout() {
     setAuthToken(null);
     setReports([]);
+    setReportsLoaded(false);
     setTab('map');
     seenAlertIds.current = {};
     hasAlertBaseline.current = false;
